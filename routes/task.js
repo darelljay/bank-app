@@ -3,7 +3,7 @@ const app = express();
 const router = express.Router();
 const session = require("express-session");
 const { model } = require("../database/model");
-const {signUp,deleteAll,checkUsers, checkBank} = require('../controllers/controller');
+const {signUp,deleteAll,checkUsers, checkBank, checkBalance, UpdateBank} = require('../controllers/controller');
 
 app.use(session({
    secret: 'kimdarell@1234',
@@ -26,16 +26,22 @@ router.get('/delete',(req,res)=>{
 });
 
 // 사용자 인증 미들웨어 
-const auth = async (req, res, next) => {
-   if (req.session && req.session.user) {
+const auth = (req, res) => {
+   if (session && session.id) {
      return checkBank();
    } else {
-     return res.sendStatus(401);
+     return 401;
    }
  }
 
+ router.post('/checkBalance',(req,res)=>{
+   res.send(checkBank());
+   // console.log(checkBalance(req.body.accountNum));
+ })
+
 router.get('/task123',(req,res)=>{
-   auth();
+   console.log(auth())
+   auth() === 401 ? res.status(401).json('not authorized User'):res.status(200).json('ok')
 });
 
 
@@ -65,9 +71,9 @@ router.post('/signIn',(req,res)=>{
       if(!docs){
          return res.status(401).send("wrong id or password");
       }
-   
-        req.session= id;
-        console.log(req.session.id);
+      session.id = id;
+      //   req.session.id = id;
+        console.log(session.id);
 
       return res.status(200).send('login succeded');
    })

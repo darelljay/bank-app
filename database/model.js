@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
 
+const mongoose = require('mongoose');
 const StudentSchema = new mongoose.Schema({
     name: {type: String, required: true},
     password:{type: String, required: true},
@@ -10,12 +10,7 @@ const StudentSchema = new mongoose.Schema({
     balance:{type:Number}
 });
 
-const Bank = new mongoose.Schema({
-    name:{type: String},
-    balance:{type: Number}
-});
 
 
 
 exports.model = mongoose.model('model', StudentSchema);
-exports.bank = mongoose.model('bank ',Bank);
