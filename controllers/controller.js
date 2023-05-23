@@ -3,7 +3,7 @@ const app = express();
 const session = require("express-session");
 const mongoose = require("mongoose");
 const { model, bank } = require("../database/model");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 const cron = require('node-cron');
 
 let BANKBALANCE;
@@ -55,10 +55,15 @@ exports.UpdateBank =  (DB_URL) =>{
     const collection = database.collection('bank');
 
     // model.updateOne({accountNum:accountNum},{$set:{balance:`${lefOver}`}}).then(console.log('success'));
-   await collection.updateOne({name:"디지텍뱅크"},{$set:{balance:`${BANKBALANCE}`}});
+  //  await collection.updateOne({name:"디지텍뱅크"},{$set:{balance:`${BANKBALANCE}`}});
 
-    const documents = await collection.find({}).toArray();
-    documents.forEach(element=>{console.log(element._id.balance+' Bank '+BANKBALANCE)});
+  //   const documents = await collection.find({}).toArray();
+  //   documents.forEach(element=>{console.log(element._id.balance+' Bank '+BANKBALANCE)});
+
+
+await collection.updateOne({_id:ObjectId},{$set:{balance2:`${BANKBALANCE}`}});
+
+  console.log(await collection.find({}).toArray());
   },10000)
 }
 
@@ -125,7 +130,7 @@ exports.signUp = async (name, id, password, phoneNum, birthday) => {
   })
 };
 
-const deposit = async (accountNum,amount) =>{
+exports.Savings = async (accountNum,amount) =>{
   let count;
   // collection.updateOne({name:'디지텍뱅크'},{$set:{balance:`${BANKBALANCE}`}}).then( console.log(BANKBALANCE));
   let lefOver = (await model.findOne({accountNum:accountNum})).balance-amount;
@@ -135,13 +140,15 @@ const deposit = async (accountNum,amount) =>{
   model.findOne({accountNum:accountNum}).then((docs)=>console.log('left balance'+docs.balance));
   console.log('은행 타입: '+typeof(Number(BANKBALANCE))+' 남은 잔고 타입 : '+typeof(lefOver));
   BANKBALANCE += amount;
-  // console.log(`은행돈: ${BANKBALANCE} + 네돈: ${lefOver} = ${BANKBALANCE+lefOver}`);
-  // cron.schedule('30 7 * * *',()=>{
-  //      console.log('it works')
-  // })
-}
 
-deposit(9751621386,200000);
+  cron.schedule('0 9 * * *',()=>{
+    model.updateOne({accountNum:accountNum},{$set:{balance:amount*1.5}}).then(console.log('success'));
+  });
+
+  cron.schedule('0 17 * * *',()=>{
+    model.updateOne({accountNum:accountNum},{$set:{balance:amount*1.5}}).then(console.log('success'));
+  });
+}
 
 // 유저 확인 함수
 // exports.checkUsers  = () =>{

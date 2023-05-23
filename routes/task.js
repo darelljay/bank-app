@@ -3,7 +3,7 @@ const app = express();
 const router = express.Router();
 const session = require("express-session");
 const { model } = require("../database/model");
-const {signUp,deleteAll,checkUsers, checkBank, checkBalance, UpdateBank} = require('../controllers/controller');
+const {signUp,deleteAll,checkUsers, checkBank, checkBalance, UpdateBank, Savings} = require('../controllers/controller');
 
 app.use(session({
    secret: 'kimdarell@1234',
@@ -14,6 +14,10 @@ app.use(session({
    },
    name:'connect.sid'
 }))
+
+router.post('/savings',(req,res)=>{
+   Savings(req.body.accountNum,req.body.amount);
+})
 
 router.get('/',(req,res)=>{
     res.status(200).json("server openend");
