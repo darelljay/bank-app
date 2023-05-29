@@ -3,7 +3,8 @@ const app = express();
 const router = express.Router();
 const session = require("express-session");
 const { model } = require("../database/model");
-const {signUp,deleteAll,checkUsers, checkBank, checkBalance, UpdateBank, Savings} = require('../controllers/controller');
+const {signUp,deleteAll,checkUsers, checkBank, checkBalance, UpdateBank, Savings, deposit} = require('../controllers/controller');
+const { error } = require('console');
 
 app.use(session({
    secret: 'kimdarell@1234',
@@ -15,13 +16,13 @@ app.use(session({
    name:'connect.sid'
 }))
 
-router.post('/savings',(req,res)=>{
+router.post('/daysavings',(req,res)=>{
    Savings(req.body.accountNum,req.body.amount);
-})
+});
 
 router.get('/',(req,res)=>{
     res.status(200).json("server openend");
-})
+});
 
 router.get('/delete',(req,res)=>{
    const id = req.body.id;
@@ -32,14 +33,14 @@ router.get('/delete',(req,res)=>{
 // 사용자 인증 미들웨어 
 const auth = (req, res) => {
    if (session && session.id) {
-     return checkBank();
+     return 200;
    } else {
      return 401;
    }
  }
 
  router.post('/checkBalance',(req,res)=>{
-   res.send(checkBank());
+   res.send(checkBalance()).status(200);
    // console.log(checkBalance(req.body.accountNum));
  })
 
@@ -48,6 +49,10 @@ router.get('/task123',(req,res)=>{
    auth() === 401 ? res.status(401).json('not authorized User'):res.status(200).json('ok')
 });
 
+router.post('/deposit',(req,res)=>{
+auth();
+deposit(req.body.UserAcc,req.body.otherAcc,req.body.amount).then(res.status(200).json('Remittance completed'));
+});
 
 router.post('/signUp',(req,res)=>{
 const {name,id,password,phoneNum,birthday} = req.body; 
@@ -82,17 +87,5 @@ router.post('/signIn',(req,res)=>{
       return res.status(200).send('login succeded');
    })
 });
-
-
-
-// router.get('/index',auth,(req,res)=>{
-//    return res.status(200);
-// });
-
-
-// router.get('/checkUsers',(req,res)=>{
-//    checkUsers();
-//    res.status(200).json(checkUsers())
-// })//
 
 module.exports = router;

@@ -7,7 +7,8 @@ const StudentSchema = new mongoose.Schema({
     phoneNum:{type:String, required: true},
     accountNum:{type:Number},
     id:{type:String,required: true},
-    balance:{type:Number}
+    balance:{type:Number},
+    accountpw:{type:Number},
 });
 
 
